@@ -1,5 +1,5 @@
 # poker_arena.py
-Mobile-API for PokerArena mobile game
+Mobile-API for [PokerArena](https://play.google.com/store/apps/details?id=air.ru.mail.games.pokerarena) mobile game
 
 ## Example
 ```python
