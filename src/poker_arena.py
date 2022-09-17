@@ -24,13 +24,15 @@ class PokerArena:
 	def generate_udid(self):
 		return md5((urandom(20))).hexdigest()
 		
-	def extinit_poker(self):
+	def extinit_poker(self, token: str = None):
 		data = {
 			"udid": self.udid,
 			"ident": "poker",
 			"lang": self.language,
 			"version": self.version
 		}
+		if token:
+			data["_token_"] = token
 		response = requests.post(
 			f"{self.api}/extinit/poker",
 			data=data,
@@ -56,7 +58,14 @@ class PokerArena:
 			headers=self.headers).json()
 		if "token" in response:
 			self.token = response["token"]
-			self.user_id = None
+			self.user_id = self.extinit_poker(self.token)["user"]["id"]
+		return response
+
+	def login_with_token(self, token: str):
+		self.token = token
+		response = self.extinit_poker(self.token)
+		if "game" in response:
+			self.user_id = response["user"]["id"]
 		return response
 
 	def register(
@@ -111,16 +120,17 @@ class PokerArena:
 			data=data,
 			headers=self.headers).json()
 
+	# choice - lo = low, hi = high
 	def play_hilo_mobile(
 			self,
 			card: str,
 			choice: str,
+			pay_with_hilocs: int = None,
 			user_hilo: str = None):
 		data = {
 			"action": "play",
 			"game_id": self.game_id,
 			"object": "hilo_mobile",
-			"pay_with_hilocs": 1,
 			"_token_": self.token,
 			"card": card,
 			"stacked_response": 1,
@@ -128,6 +138,9 @@ class PokerArena:
 		}
 		if user_hilo:
 			data["user_hilo"] = user_hilo
+		if pay_with_hilocs:
+			data["pay_with_hilocs"] = pay_with_hilocs
+			data["pay"] = 1
 		return requests.post(
 			f"{self.api}/index.php",
 			data=data,
@@ -177,7 +190,7 @@ class PokerArena:
 		if picture:
 			data["pic"] = picture
 		return requests.post(
-			f"{self.api}/achievement/profile/edit",
+			f"{self.api}/profile/edit",
 			data=data,
 			headers=self.headers).json()
 
