@@ -8,7 +8,7 @@ class PokerArena:
 			self,
 			version: str = "2.4.82",
 			language: str = "ru",
-			game_id: int = 82):
+			game_id: int = 82) -> None:
 		self.api = "https://adrminigames.mail.ru"
 		self.headers = {
 			"user-agent": "Mozilla/5.0 (Android; U; ru-RU) AppleWebKit/533.19.4 (KHTML, like Gecko) AdobeAIR/33.0",
@@ -21,10 +21,10 @@ class PokerArena:
 		self.udid = self.generate_udid()
 		self.extinit_poker()
 	
-	def generate_udid(self):
+	def generate_udid(self) -> str:
 		return md5((urandom(20))).hexdigest()
 		
-	def extinit_poker(self, token: str = None):
+	def extinit_poker(self, token: str = None) -> dict:
 		data = {
 			"udid": self.udid,
 			"ident": "poker",
@@ -42,7 +42,10 @@ class PokerArena:
 			self.token = response["user"]["web_token"]
 		return response
 			
-	def login(self, email: str, password: str):
+	def login(
+			self,
+			email: str,
+			password: str) -> dict:
 		data = {
 			"login": email,
 			"udid": self.udid,
@@ -61,7 +64,7 @@ class PokerArena:
 			self.user_id = self.extinit_poker(self.token)["user"]["id"]
 		return response
 
-	def login_with_token(self, token: str):
+	def login_with_token(self, token: str) -> dict:
 		self.token = token
 		response = self.extinit_poker(self.token)
 		if "game" in response:
@@ -72,7 +75,7 @@ class PokerArena:
 			self,
 			email: str,
 			password: str,
-			nickname: str):
+			nickname: str) -> dict:
 		data = {
 			"ident": "Poker",
 			"socnet": 1,
@@ -92,12 +95,12 @@ class PokerArena:
 			data=data,
 			headers=self.headers).json()
 	
-	def get_room_list(self):
+	def get_room_list(self) -> dict:
 		return requests.get(
 			f"{self.api}/game/Poker/roomlist?version={self.version}",
 			headers=self.headers).json()
 
-	def udid_bind(self):
+	def udid_bind(self) -> dict:
 		data = {
 			"_token_": self.token,
 			"uid": self.user_id,
@@ -108,7 +111,7 @@ class PokerArena:
 			data=data,
 			headers=self.headers).json()
 
-	def get_state(self):
+	def get_state(self) -> dict:
 		data = {
 			"action": "state",
 			"_token_": self.token,
@@ -120,13 +123,17 @@ class PokerArena:
 			data=data,
 			headers=self.headers).json()
 
-	# choice - lo = low, hi = high
 	def play_hilo_mobile(
 			self,
 			card: str,
 			choice: str,
 			pay_with_hilocs: int = None,
-			user_hilo: str = None):
+			user_hilo: str = None) -> dict:
+		"""
+		CHOICE:
+			LO - LOW
+			HI - HIGH
+		"""
 		data = {
 			"action": "play",
 			"game_id": self.game_id,
@@ -146,7 +153,7 @@ class PokerArena:
 			data=data,
 			headers=self.headers).json()
 
-	def get_user_info(self, user_id: int):
+	def get_user_info(self, user_id: int) -> dict:
 		data = {
 			"gifts": 100,
 			"_token_": self.token,
@@ -159,7 +166,7 @@ class PokerArena:
 			data=data,
 			headers=self.headers).json()
 
-	def get_user_achievements(self, user_id: int):
+	def get_user_achievements(self, user_id: int) -> dict:
 		data = {
 			"_token_": self.token,
 			"nc": int(time() * 1000),
@@ -172,7 +179,7 @@ class PokerArena:
 			data=data,
 			headers=self.headers).json()
 
-	def get_gifts_list(self):
+	def get_gifts_list(self) -> dict:
 		return requests.get(
 			f"{self.api}/gift/list?_token_={self.token}&version={self.version}",
 			headers=self.headers).json()
@@ -180,7 +187,7 @@ class PokerArena:
 	def edit_profile(
 			self,
 			nickname: str = None,
-			picture: str = None):
+			picture: str = None) -> dict:
 		data = {
 			"_token_": self.token,
 			"version": self.version			
@@ -197,7 +204,7 @@ class PokerArena:
 	def get_top_players(
 			self,
 			count: int = 100,
-			type: str = "all"):
+			type: str = "all") -> dict:
 		data = {
 			"_token_": self.token,
 			"new": 1,
@@ -210,7 +217,7 @@ class PokerArena:
 			data=data,
 			headers=self.headers).json()
 
-	def get_tournament_players(self, type: int = 1):
+	def get_tournament_players(self, type: int = 1) -> dict:
 		data = {
 			"action": "state",
 			"_token_": self.token,
